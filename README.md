@@ -1,0 +1,1 @@
+# AssaultCube internal cheat
