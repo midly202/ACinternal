@@ -5,7 +5,7 @@
 void MsgBoxAddy(uintptr_t addy)
 {
 	char szBuffer[1024];
-	sprintf_s(szBuffer, "Address: %016llX", addy);
+	sprintf_s(szBuffer, "Address: %08X", addy);
 	MessageBoxA(NULL, szBuffer, "Address", MB_OK);
 }
 
@@ -66,7 +66,6 @@ void PlaceJMP(BYTE* address, uintptr_t jumpTo, uintptr_t length)
 	VirtualProtect(address, length, dwOldProtect, &dwBkup);
 }
 
-// Function to check if it's safe to uninject
 bool CanUninject(bool thread1Running, bool thread2Running)
 {
 	if (thread1Running || thread2Running)
