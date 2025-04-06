@@ -5,16 +5,18 @@
 #include <thread>
 #include "functions.h"
 
-// global flag
+// global vars
 uintptr_t baseAddress = (uintptr_t)GetModuleHandleA("ac_client.exe");
 uintptr_t playerBase = *reinterpret_cast<uintptr_t*>(baseAddress + 0x17E0A8);
+
+uintptr_t ammoFunc = *reinterpret_cast<uintptr_t*>(baseAddress + 0xC73EF);
+char ammoOriginalBytes[2];
+char ammoOpCode[] = { 0x90, 0x90 };
+
+bool infiniteAmmoEnabled = false;
 bool noclipEnabled = false;
 bool godmodeEnabled = false;
 bool rapidFireEnabled = false;
-bool infiniteAmmoEnabled = false;
-char ammoOriginalBytes[2];
-char ammoOpCode[] = { 0x90, 0x90 };
-uintptr_t ammoFunc = baseAddress + 0xC73EF;
 bool thread1Running = true;
 bool thread2Running = true;
 bool thread3Running = true;
