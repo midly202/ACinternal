@@ -2,6 +2,29 @@
 #include <Psapi.h>
 #include <Windows.h>
 
+extern bool godmodeEnabled;
+extern bool infiniteAmmoEnabled;
+extern bool noclipEnabled;
+extern bool rapidFireEnabled;
+extern uintptr_t playerBase;
+
+namespace offset
+{
+	constexpr uintptr_t posHead = 0x4;
+	constexpr uintptr_t posBody = 0x28;
+	constexpr uintptr_t viewAngles = 0x34;
+	constexpr uintptr_t noClip = 0x76;
+	constexpr uintptr_t health = 0xEC;
+	constexpr uintptr_t armor = 0xF0;
+	constexpr uintptr_t pistolAmmo = 0x108;
+	constexpr uintptr_t arAmmo = 0x11C;
+	constexpr uintptr_t pistolClip = 0x12C;
+	constexpr uintptr_t arClip = 0x140;
+	constexpr uintptr_t isKnifing = 0x14C;
+	constexpr uintptr_t pistolDelay = 0x150;
+	constexpr uintptr_t arDelay = 0x164;
+}
+
 void MsgBoxAddy(uintptr_t addy)
 {
 	char szBuffer[1024];
@@ -22,10 +45,19 @@ MODULEINFO GetModuleInfo(const char* szModule)
 void WriteToMemory(uintptr_t addressToWrite, char* valueToWrite, int byteNum)
 {
 	unsigned long oldProtection;
-	VirtualProtect((LPVOID)addressToWrite, byteNum, PAGE_EXECUTE_READWRITE, &oldProtection);
+	if (!VirtualProtect((LPVOID)addressToWrite, byteNum, PAGE_EXECUTE_READWRITE, &oldProtection))
+	{
+		std::cerr << "Failed to change memory protection!" << std::endl;
+		return;
+	}
+
 	memcpy((LPVOID)addressToWrite, valueToWrite, byteNum);
+
 	unsigned long temp;
-	VirtualProtect((LPVOID)addressToWrite, byteNum, oldProtection, &temp);
+	if (!VirtualProtect((LPVOID)addressToWrite, byteNum, oldProtection, &temp))
+	{
+		std::cerr << "Failed to restore memory protection!" << std::endl;
+	}
 }
 
 uintptr_t FindPattern(const char* module, const char* pattern, const char* mask)
@@ -66,10 +98,83 @@ void PlaceJMP(BYTE* address, uintptr_t jumpTo, uintptr_t length)
 	VirtualProtect(address, length, dwOldProtect, &dwBkup);
 }
 
-bool CanUninject(bool thread1Running, bool thread2Running)
+bool CanUninject(bool thread1Running, bool thread2Running, bool thread3running)
 {
-	if (thread1Running || thread2Running)
+	if (thread1Running || thread2Running || thread3running)
 		return false; // Returns false if either thread is still running
 	else
 		return true; // Returns true if both threads have exited
+}
+
+void showMenu(bool infiniteAmmo, bool noClip, bool Godmode, bool rapidFireEnabled)
+{
+	std::cout << "[1] Infinite Ammo [" << (infiniteAmmo ? "ON" : "OFF") << "]\n";
+	std::cout << "[2] NoClip [" << (noClip ? "ON" : "OFF") << "]\n";
+	std::cout << "[3] Godmode [" << (Godmode ? "ON" : "OFF") << "]\n";
+	std::cout << "[4] Rapid Fire [" << (rapidFireEnabled ? "ON" : "OFF") << "]\n";
+}
+
+void WaitForKeyRelease(int vkKey)
+{
+	while (GetAsyncKeyState(vkKey)) Sleep(10);
+}
+
+void ToggleGodmode()
+{
+	godmodeEnabled = !godmodeEnabled;
+	WaitForKeyRelease(VK_NUMPAD3);
+	system("cls");
+	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled);
+}
+
+void MaintainGodmode()
+{
+	int* health = reinterpret_cast<int*>(playerBase + offset::health);
+	int* armor = reinterpret_cast<int*>(playerBase + offset::armor);
+
+	while (godmodeEnabled && !GetAsyncKeyState(VK_NUMPAD0))
+	{
+		*health = 100;
+		*armor = 100;
+		Sleep(5);
+
+		if (GetAsyncKeyState(VK_NUMPAD3) & 1)
+		{
+			godmodeEnabled = false;
+			WaitForKeyRelease(VK_NUMPAD3);
+			system("cls");
+			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled);
+			break;
+		}
+	}
+}
+
+void ToggleRapidFire()
+{
+	rapidFireEnabled = !rapidFireEnabled;
+	WaitForKeyRelease(VK_NUMPAD4);
+	system("cls");
+	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled);
+}
+
+void MaintainRapidFire()
+{
+	int32_t* pistolDelay = reinterpret_cast<int32_t*>((uintptr_t)playerBase + offset::pistolDelay);
+	int32_t* arDelay = reinterpret_cast<int32_t*>((uintptr_t)playerBase + offset::arDelay);
+
+	while (rapidFireEnabled && !GetAsyncKeyState(VK_NUMPAD0))
+	{
+		*pistolDelay = 0;
+		*arDelay = 0;
+		Sleep(5);
+
+		if (GetAsyncKeyState(VK_NUMPAD4) & 1)
+		{
+			rapidFireEnabled = false;
+			WaitForKeyRelease(VK_NUMPAD4);
+			system("cls");
+			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled);
+			break;
+		}
+	}
 }
