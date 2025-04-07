@@ -8,6 +8,9 @@
 // global vars
 uintptr_t baseAddress = (uintptr_t)GetModuleHandleA("ac_client.exe");
 uintptr_t playerBase = *reinterpret_cast<uintptr_t*>(baseAddress + 0x17E0A8);
+uintptr_t entityList = *reinterpret_cast<uintptr_t*>(baseAddress + 0x18AC04);
+uintptr_t currentWeapon = *reinterpret_cast<uintptr_t*>(playerBase + 0x368);
+uintptr_t currentWeaponStats = *reinterpret_cast<uintptr_t*>(currentWeapon + 0x10);
 
 uintptr_t ammoFunc = baseAddress + 0xC73EF;
 char ammoOriginalBytes[2];
@@ -17,11 +20,16 @@ uintptr_t recoilFunc = baseAddress + 0xC2EC3;
 char recoilOriginalBytes[5];
 char recoilOpCode[] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
 
+uintptr_t kickbackFunc = baseAddress + 0xC0ACF;
+char kickbackOriginalBytes[4];
+char kickbackOpCode[] = { 0x90, 0x90, 0x90, 0x90 };
+
 bool infiniteAmmoEnabled = false;
 bool noclipEnabled = false;
 bool godmodeEnabled = false;
 bool rapidFireEnabled = false;
 bool noRecoilEnabled = false;
+bool noSpreadEnabled = false;
 bool thread1Running = true;
 bool thread2Running = true;
 bool thread3Running = true;
@@ -119,6 +127,10 @@ void OverwriteValues(HMODULE instance) noexcept
 				system("cls");
 				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled);
 			}
+		}
+		else if (GetAsyncKeyState(VK_NUMPAD6) & 1)
+		{
+			// no spread hack
 		}
 	}
 	

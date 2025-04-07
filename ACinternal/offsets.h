@@ -14,4 +14,6 @@ namespace offset
 	constexpr uintptr_t isKnifing = 0x14C;
 	constexpr uintptr_t pistolDelay = 0x150;
 	constexpr uintptr_t arDelay = 0x164;
+	constexpr uintptr_t shotsFired = 0x6C;
+	constexpr uintptr_t currentWeaponClip = 0x24;
 }

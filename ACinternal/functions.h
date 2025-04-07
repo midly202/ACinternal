@@ -8,7 +8,11 @@ extern bool infiniteAmmoEnabled;
 extern bool noclipEnabled;
 extern bool rapidFireEnabled;
 extern bool noRecoilEnabled;
+extern bool noSpreadEnabled;
 extern uintptr_t playerBase;
+extern uintptr_t entityList;
+extern uintptr_t currentWeapon;
+extern uintptr_t currentWeaponStats;
 
 void MsgBoxAddy(uintptr_t addy)
 {
