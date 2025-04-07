@@ -7,6 +7,7 @@ extern bool godmodeEnabled;
 extern bool infiniteAmmoEnabled;
 extern bool noclipEnabled;
 extern bool rapidFireEnabled;
+extern bool noRecoilEnabled;
 extern uintptr_t playerBase;
 
 void MsgBoxAddy(uintptr_t addy)
@@ -90,12 +91,13 @@ bool CanUninject(bool thread1Running, bool thread2Running, bool thread3running)
 		return true; // Returns true if both threads have exited
 }
 
-void showMenu(bool infiniteAmmo, bool noClip, bool Godmode, bool rapidFireEnabled)
+void showMenu(bool infiniteAmmo, bool noClip, bool Godmode, bool rapidFireEnabled, bool noRecoilEnabled)
 {
 	std::cout << "[1] Infinite Ammo [" << (infiniteAmmo ? "ON" : "OFF") << "]\n";
 	std::cout << "[2] NoClip [" << (noClip ? "ON" : "OFF") << "]\n";
 	std::cout << "[3] Godmode [" << (Godmode ? "ON" : "OFF") << "]\n";
 	std::cout << "[4] Rapid Fire [" << (rapidFireEnabled ? "ON" : "OFF") << "]\n";
+	std::cout << "[5] No Recoil [" << (noRecoilEnabled ? "ON" : "OFF") << "]\n";
 }
 
 void WaitForKeyRelease(int vkKey)
@@ -108,7 +110,7 @@ void ToggleGodmode()
 	godmodeEnabled = !godmodeEnabled;
 	WaitForKeyRelease(VK_NUMPAD3);
 	system("cls");
-	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled);
+	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled);
 }
 
 void MaintainGodmode()
@@ -127,7 +129,7 @@ void MaintainGodmode()
 			godmodeEnabled = false;
 			WaitForKeyRelease(VK_NUMPAD3);
 			system("cls");
-			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled);
+			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled);
 			break;
 		}
 	}
@@ -138,7 +140,7 @@ void ToggleRapidFire()
 	rapidFireEnabled = !rapidFireEnabled;
 	WaitForKeyRelease(VK_NUMPAD4);
 	system("cls");
-	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled);
+	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled);
 }
 
 void MaintainRapidFire()
@@ -157,7 +159,7 @@ void MaintainRapidFire()
 			rapidFireEnabled = false;
 			WaitForKeyRelease(VK_NUMPAD4);
 			system("cls");
-			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled);
+			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled);
 			break;
 		}
 	}

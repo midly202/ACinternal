@@ -9,14 +9,19 @@
 uintptr_t baseAddress = (uintptr_t)GetModuleHandleA("ac_client.exe");
 uintptr_t playerBase = *reinterpret_cast<uintptr_t*>(baseAddress + 0x17E0A8);
 
-uintptr_t ammoFunc = *reinterpret_cast<uintptr_t*>(baseAddress + 0xC73EF);
+uintptr_t ammoFunc = baseAddress + 0xC73EF;
 char ammoOriginalBytes[2];
 char ammoOpCode[] = { 0x90, 0x90 };
+
+uintptr_t recoilFunc = baseAddress + 0xC2EC3;
+char recoilOriginalBytes[5];
+char recoilOpCode[] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
 
 bool infiniteAmmoEnabled = false;
 bool noclipEnabled = false;
 bool godmodeEnabled = false;
 bool rapidFireEnabled = false;
+bool noRecoilEnabled = false;
 bool thread1Running = true;
 bool thread2Running = true;
 bool thread3Running = true;
@@ -27,8 +32,9 @@ void Initialization(HMODULE instance) noexcept
 	AllocConsole();
 	FILE* f = nullptr;
 	freopen_s(&f, "CONOUT$", "w", stdout);
-	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled);
+	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled);
 	memcpy(ammoOriginalBytes, (void*)ammoFunc, 2);
+	memcpy(recoilOriginalBytes, (void*)recoilFunc, 5);
 
 
 	// wait for uninjection process
@@ -63,13 +69,13 @@ void OverwriteValues(HMODULE instance) noexcept
 			{
 				WriteToMemory(ammoFunc, ammoOpCode, 2);
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled);
 			}
 			else
 			{
 				WriteToMemory(ammoFunc, ammoOriginalBytes, 2);
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled);
 			}
 		}
 		else if (GetAsyncKeyState(VK_NUMPAD2) & 1)
@@ -83,7 +89,7 @@ void OverwriteValues(HMODULE instance) noexcept
 				{
 					*noClip = 4;
 					system("cls");
-					showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled);
+					showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled);
 				}
 				__except (EXCEPTION_EXECUTE_HANDLER)
 				{
@@ -94,7 +100,24 @@ void OverwriteValues(HMODULE instance) noexcept
 			{
 				*noClip = 0;
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled);
+			}
+		}
+		else if (GetAsyncKeyState(VK_NUMPAD5) & 1)
+		{
+			noRecoilEnabled = !noRecoilEnabled;
+
+			if (noRecoilEnabled)
+			{
+				WriteToMemory(recoilFunc, recoilOpCode, 5);
+				system("cls");
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled);
+			}
+			else
+			{
+				WriteToMemory(recoilFunc, recoilOriginalBytes, 5);
+				system("cls");
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled);
 			}
 		}
 	}
