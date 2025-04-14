@@ -2,7 +2,6 @@
 
 An internal cheat for AssaultCube, designed for educational and game-hacking practice purposes. 
 
-Thread-based modular system for each feature toggle
 Console UI shows current status of all toggles (ON/OFF)
 
 ---
