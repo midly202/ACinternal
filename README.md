@@ -10,7 +10,6 @@ Console UI shows current status of all toggles (ON/OFF)
 
 A simple in-game menu toggleable via hotkeys:
 
-|--------:|-------------------|-----------------------------------------------------------------------------|
 | Keybind | Feature           | Description                                                                 |
 |--------:|-------------------|-----------------------------------------------------------------------------|
 |   [1]   | Infinite Ammo      | Never run out of bullets — removes ammo decrement logic.                   |
@@ -22,4 +21,3 @@ A simple in-game menu toggleable via hotkeys:
 |   [7]   | Invisible          | Turn completely invisible, both against bots and online.                   |
 |   [8]   | Aimbot             | Automatically aim at the nearest enemy.                                    |
 |   [9]   | ESP                | Work-in-progress: draws boxes around enemies and shows health, distance.   |
-|--------:|-------------------|-----------------------------------------------------------------------------|
