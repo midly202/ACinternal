@@ -131,6 +131,24 @@ void WaitForKeyRelease(int vkKey)
 	while (GetAsyncKeyState(vkKey)) Sleep(10);
 }
 
+bool IsKeyPressedOnce(int vKey)
+{
+	static bool keyDown[256] = {};
+	if (GetAsyncKeyState(vKey) & 0x8000)
+	{
+		if (!keyDown[vKey])
+		{
+			keyDown[vKey] = true;
+			return true;
+		}
+	}
+	else
+	{
+		keyDown[vKey] = false;
+	}
+	return false;
+}
+
 float euclidean_distance(float x, float y) 
 {
 	return sqrtf((x * x) + (y * y));
@@ -342,12 +360,24 @@ void MaintainAimbot()
 {
 	while (aimbotEnabled && !GetAsyncKeyState(VK_NUMPAD0))
 	{
+		// Toggle off
+		if (IsKeyPressedOnce(VK_NUMPAD8))
+		{
+			aimbotEnabled = false;
+			WaitForKeyRelease(VK_NUMPAD8);
+			system("cls");
+			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+			break;
+		}
+
+		if (!GetAsyncKeyState(VK_LBUTTON) && !GetAsyncKeyState(VK_RBUTTON)) continue;
+
 		// Get local player
 		ent* player = *(ent**)(baseAddress + offset::playerBase);
 		if (!player) continue;
 
 		// Get entity list
-		ent** entityList = *(ent***)(0x58AC04);
+		ent** entityList = *(ent***)(baseAddress + offset::entityList);
 		if (!entityList) continue;
 
 		// Get current player count
@@ -358,9 +388,10 @@ void MaintainAimbot()
 		float closest_yaw = 0.0f;
 		float closest_pitch = 0.0f;
 
-		for (int i = 0; i < *current_players; i++) {
+		for (int i = 0; i < *current_players; i++) 
+		{
 			ent* enemy = entityList[i];
-			if (!enemy || enemy == player || !enemy->alive) continue;
+			if (!enemy || enemy == player || enemy->health <= 0 || enemy->team == player->team) continue;
 
 			// Calculate positional difference
 			float abspos_x = enemy->posHead.x - player->posHead.x;
@@ -368,7 +399,8 @@ void MaintainAimbot()
 			float abspos_z = enemy->posHead.z - player->posHead.z;
 
 			float temp_distance = euclidean_distance(abspos_x, abspos_y);
-			if (closest_player == -1.0f || temp_distance < closest_player) {
+			if (closest_player == -1.0f || temp_distance < closest_player) 
+			{
 				closest_player = temp_distance;
 
 				float yaw = atan2f(abspos_y, abspos_x) * (180.0f / M_PI);
@@ -376,7 +408,8 @@ void MaintainAimbot()
 
 				// Fixing low angle jitter
 				if (abspos_y < 0) abspos_y *= -1;
-				if (abspos_y < 5) {
+				if (abspos_y < 5) 
+				{
 					if (abspos_x < 0) abspos_x *= -1;
 					abspos_y = abspos_x;
 				}
@@ -386,20 +419,12 @@ void MaintainAimbot()
 			}
 		}
 
-		// Apply view angles
-		player->angles.x = closest_yaw;
-		player->angles.y = closest_pitch;
+		if (closest_player != -1.0f)
+		{
+			player->angles.x = closest_yaw;
+			player->angles.y = closest_pitch;
+		}
 
 		Sleep(1);
-
-		// Toggle off
-		if (GetAsyncKeyState(VK_NUMPAD8) & 1)
-		{
-			aimbotEnabled = false;
-			WaitForKeyRelease(VK_NUMPAD8);
-			system("cls");
-			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
-			break;
-		}
 	}
 }
