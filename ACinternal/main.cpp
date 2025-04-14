@@ -3,13 +3,10 @@
 #include <Windows.h>
 #include <cstdint>
 #include <thread>
-#include <atomic>
 #include "functions.h"
 
 // global vars
 uintptr_t baseAddress = (uintptr_t)GetModuleHandleA("ac_client.exe");
-uintptr_t playerBase = *reinterpret_cast<uintptr_t*>(baseAddress + offset::playerBase);
-uintptr_t entityList = *reinterpret_cast<uintptr_t*>(baseAddress + offset::entityList);
 ent* player = NULL;
 gameInfo* game = NULL;
 currWeapon* currentWeapon = NULL;
@@ -103,14 +100,17 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 		else if (GetAsyncKeyState(VK_NUMPAD2) & 1)
 		{
 			noclipEnabled = !noclipEnabled;
-			int16_t* noClip = reinterpret_cast<int16_t*>((uintptr_t)playerBase + offset::noClip);
 
+			DWORD* playerBasePtr = (DWORD*)(baseAddress + offset::playerBase);
+			if (!playerBasePtr || !*playerBasePtr) continue;
+
+			ent* player = (ent*)(*playerBasePtr);
 
 			if (noclipEnabled)
 			{
 				__try
 				{
-					*noClip = 4;
+					player->noClip = 4;
 					system("cls");
 					showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
 				}
@@ -121,7 +121,7 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 			}
 			else
 			{
-				*noClip = 0;
+				player->noClip = 0;
 				system("cls");
 				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
 			}
@@ -148,13 +148,17 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 		else if (GetAsyncKeyState(VK_NUMPAD7) & 1)
 		{
 			invisEnabled = !invisEnabled;
-			int16_t* invis = reinterpret_cast<int16_t*>((uintptr_t)playerBase + offset::noClip);
+
+			DWORD* playerBasePtr = (DWORD*)(baseAddress + offset::playerBase);
+			if (!playerBasePtr || !*playerBasePtr) continue;
+
+			ent* player = (ent*)(*playerBasePtr);
 
 			if (invisEnabled)
 			{
 				__try
 				{
-					*invis = 11;
+					player->noClip = 11;
 					system("cls");
 					showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
 				}
@@ -165,7 +169,7 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 			}
 			else
 			{
-				*invis = 0;
+				player->noClip = 0;
 				system("cls");
 				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
 			}

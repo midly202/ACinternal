@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstdint>
 #include <math.h>
+#include <thread>
 #include "offsets.h"
 
 #define M_PI 3.14159265358979323846
@@ -156,7 +157,6 @@ struct Angle
 	float Yaw, Pitch;
 };
 
-/*
 bool WorldToScreen(Vec3 pos, Vec2& screen, float matrix[16], int windowWidth, int windowHeight)
 {
 	Vec4 clipCoords = {};
@@ -181,48 +181,6 @@ bool WorldToScreen(Vec3 pos, Vec2& screen, float matrix[16], int windowWidth, in
 
 	return true;
 }
-*/
-
-void ToggleInfiniteAmmo()
-{
-	infiniteAmmoEnabled = !infiniteAmmoEnabled;
-
-	if (infiniteAmmoEnabled)
-	{
-		WriteToMemory(ammoFunc, ammoOpCode, 2);
-	}
-	else
-	{
-		WriteToMemory(ammoFunc, ammoOriginalBytes, 2);
-	}
-
-	WaitForKeyRelease(VK_NUMPAD1);
-	system("cls");
-	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
-}
-
-void MaintainInfiniteAmmo()
-{
-	while (infiniteAmmoEnabled && !GetAsyncKeyState(VK_NUMPAD0))
-	{
-		uintptr_t currentWeapon = *reinterpret_cast<uintptr_t*>(playerBase + 0x368);
-		uintptr_t currentWeaponStatsStatic = *reinterpret_cast<uintptr_t*>(currentWeapon + 0xC);
-		uintptr_t currentWeaponStatsDynamic = *reinterpret_cast<uintptr_t*>(currentWeapon + 0x10);
-
-		int* ammo = reinterpret_cast<int*>(currentWeaponStatsDynamic + offset::weaponClip);
-		*ammo = 999;
-		Sleep(5);
-
-		if (GetAsyncKeyState(VK_NUMPAD1) & 1)
-		{
-			infiniteAmmoEnabled = !infiniteAmmoEnabled;
-			WaitForKeyRelease(VK_NUMPAD1);
-			system("cls");
-			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
-			break;
-		}
-	}
-}
 
 void ToggleNoKickback()
 {
@@ -237,13 +195,24 @@ void MaintainNoKickback()
 {
 	while (noKickbackEnabled && !GetAsyncKeyState(VK_NUMPAD0))
 	{
-		// current weapon so these pointers change
-		uintptr_t currentWeapon = *reinterpret_cast<uintptr_t*>(playerBase + 0x368);
-		uintptr_t currentWeaponStatsStatic = *reinterpret_cast<uintptr_t*>(currentWeapon + 0xC);
-		uintptr_t currentWeaponStatsDynamic = *reinterpret_cast<uintptr_t*>(currentWeapon + 0x10);
+		// current weapon so this pointers changes
+		DWORD* playerBasePtr = (DWORD*)(baseAddress + offset::playerBase);
+		if (!playerBasePtr || !*playerBasePtr) continue;
 
-		int16_t* kickback = reinterpret_cast<int16_t*>(currentWeaponStatsStatic + offset::weaponKickback);
-		*kickback = 0;
+		ent* player = (ent*)(*playerBasePtr);
+
+		uintptr_t currentWeaponAddr = *(uintptr_t*)((uintptr_t)player + 0x368);
+		if (!currentWeaponAddr) continue;
+
+		currWeapon* currentWeapon = (currWeapon*)currentWeaponAddr;
+
+		uintptr_t currentWeaponStatsStaticAddr = *(uintptr_t*)(currentWeaponAddr + 0xC);
+		if (!currentWeaponStatsStaticAddr) continue;
+
+		weaponStatsStatic* currentWeaponStatsStatic = (weaponStatsStatic*)currentWeaponStatsStaticAddr;
+
+		currentWeaponStatsStatic->weaponKickback = 0;
+
 		Sleep(5);
 	}
 }
@@ -258,20 +227,22 @@ void ToggleGodmode()
 
 void MaintainGodmode()
 {
-	int* health = reinterpret_cast<int*>(playerBase + offset::health);
-	int* armor = reinterpret_cast<int*>(playerBase + offset::armor);
-
 	while (godmodeEnabled && !GetAsyncKeyState(VK_NUMPAD0))
 	{
-		*health = 999;
-		*armor = 999;
+		DWORD* playerBasePtr = (DWORD*)(baseAddress + offset::playerBase);
+		if (!playerBasePtr || !*playerBasePtr) continue;
+
+		ent* player = (ent*)(*playerBasePtr);
+
+		player->health = 999;
+		player->armor = 999;
 		Sleep(5);
 
 		if (GetAsyncKeyState(VK_NUMPAD3) & 1)
 		{
 			godmodeEnabled = false;
-			*health = 100;
-			*armor = 100;
+			player->health = 100;
+			player->armor = 100;
 			WaitForKeyRelease(VK_NUMPAD3);
 			system("cls");
 			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
