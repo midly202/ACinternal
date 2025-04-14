@@ -20,4 +20,3 @@ A simple in-game menu toggleable via hotkeys:
 |   [6]   | No Kickback        | Disables weapon kickback.                                                  |
 |   [7]   | Invisible          | Turn completely invisible, both against bots and online.                   |
 |   [8]   | Aimbot             | Automatically aim at the nearest enemy.                                    |
-|   [9]   | ESP                | Work-in-progress: draws boxes around enemies and shows health, distance.   |
