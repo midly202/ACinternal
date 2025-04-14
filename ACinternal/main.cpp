@@ -8,8 +8,13 @@
 
 // global vars
 uintptr_t baseAddress = (uintptr_t)GetModuleHandleA("ac_client.exe");
-uintptr_t playerBase = *reinterpret_cast<uintptr_t*>(baseAddress + 0x17E0A8);
-uintptr_t entityList = *reinterpret_cast<uintptr_t*>(baseAddress + 0x18AC04);
+uintptr_t playerBase = *reinterpret_cast<uintptr_t*>(baseAddress + offset::playerBase);
+uintptr_t entityList = *reinterpret_cast<uintptr_t*>(baseAddress + offset::entityList);
+ent* player = NULL;
+gameInfo* game = NULL;
+currWeapon* currentWeapon = NULL;
+weaponStatsDynamic* currentWeaponStatsDynamic = NULL;
+weaponStatsStatic* currentWeaponStatsStatic = NULL;
 
 uintptr_t ammoFunc = baseAddress + 0xC73EF;
 char ammoOriginalBytes[2];
@@ -32,10 +37,12 @@ bool noRecoilEnabled = false;
 bool noKickbackEnabled = false;
 bool noKickbackLocked = false;
 bool noSpreadEnabled = false;
+bool aimbotEnabled = false;
 bool thread1Running = true;
 bool thread2Running = true;
 bool thread3Running = true;
 bool thread4Running = true;
+bool thread5Running = true;
 
 void Initialization(HMODULE instance) noexcept
 {
@@ -43,7 +50,7 @@ void Initialization(HMODULE instance) noexcept
 	AllocConsole();
 	FILE* f = nullptr;
 	freopen_s(&f, "CONOUT$", "w", stdout);
-	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled);
+	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
 	memcpy(ammoOriginalBytes, (void*)ammoFunc, 2);
 	memcpy(nadeOriginalBytes, (void*)nadeFunc, 2);
 	memcpy(recoilOriginalBytes, (void*)recoilFunc, 5);
@@ -57,7 +64,7 @@ void Initialization(HMODULE instance) noexcept
 
 	// Cleanup and exit
 	Sleep(100);
-	while (!CanUninject(thread1Running, thread2Running, thread3Running, thread4Running))
+	while (!CanUninject(thread1Running, thread2Running, thread3Running, thread4Running, thread5Running))
 	{
 		std::cout << "Cannot uninject yet! Threads still running.\n";
 		Sleep(100);
@@ -82,14 +89,14 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 				WriteToMemory(ammoFunc, ammoOpCode, 2);
 				WriteToMemory(nadeFunc, nadeOpCode, 2);
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
 			}
 			else
 			{
 				WriteToMemory(ammoFunc, ammoOriginalBytes, 2);
 				WriteToMemory(nadeFunc, nadeOriginalBytes, 2);
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
 			}
 		}
 		// noclip
@@ -98,13 +105,14 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 			noclipEnabled = !noclipEnabled;
 			int16_t* noClip = reinterpret_cast<int16_t*>((uintptr_t)playerBase + offset::noClip);
 
+
 			if (noclipEnabled)
 			{
 				__try
 				{
 					*noClip = 4;
 					system("cls");
-					showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled);
+					showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
 				}
 				__except (EXCEPTION_EXECUTE_HANDLER)
 				{
@@ -115,7 +123,7 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 			{
 				*noClip = 0;
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
 			}
 		}
 		// no recoil
@@ -127,13 +135,13 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 			{
 				WriteToMemory(recoilFunc, recoilOpCode, 5);
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
 			}
 			else
 			{
 				WriteToMemory(recoilFunc, recoilOriginalBytes, 5);
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
 			}
 		}
 		// yoru ult
@@ -148,7 +156,7 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 				{
 					*invis = 11;
 					system("cls");
-					showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled);
+					showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
 				}
 				__except (EXCEPTION_EXECUTE_HANDLER)
 				{
@@ -159,7 +167,7 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 			{
 				*invis = 0;
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
 			}
 		}
 	}
@@ -215,6 +223,21 @@ void RapidFire(HMODULE instance) noexcept
 	thread4Running = false;
 }
 
+void Aimbot(HMODULE instance) noexcept
+{
+	while (!GetAsyncKeyState(VK_NUMPAD0))
+	{
+		Sleep(5);
+		if (GetAsyncKeyState(VK_NUMPAD8) & 1)
+		{
+			ToggleAimbot();
+			if (aimbotEnabled)
+				MaintainAimbot();
+		}
+	}
+	thread5Running = false;
+}
+
 int __stdcall DllMain(HMODULE instance, std::uintptr_t reason, const void* reserved)
 {
 	switch (reason)
@@ -231,6 +254,8 @@ int __stdcall DllMain(HMODULE instance, std::uintptr_t reason, const void* reser
 		if (thread4) CloseHandle(thread4);
 		const auto thread5 = CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(RapidFire), instance, 0, nullptr);
 		if (thread5) CloseHandle(thread5);
+		const auto thread6 = CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(Aimbot), instance, 0, nullptr);
+		if (thread6) CloseHandle(thread6);
 		break;
 	}
 
