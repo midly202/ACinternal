@@ -32,7 +32,6 @@ bool godmodeEnabled = false;
 bool rapidFireEnabled = false;
 bool noRecoilEnabled = false;
 bool noKickbackEnabled = false;
-bool noKickbackLocked = false;
 bool noSpreadEnabled = false;
 bool aimbotEnabled = false;
 bool thread1Running = true;
@@ -47,7 +46,7 @@ void Initialization(HMODULE instance) noexcept
 	AllocConsole();
 	FILE* f = nullptr;
 	freopen_s(&f, "CONOUT$", "w", stdout);
-	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 	memcpy(ammoOriginalBytes, (void*)ammoFunc, 2);
 	memcpy(nadeOriginalBytes, (void*)nadeFunc, 2);
 	memcpy(recoilOriginalBytes, (void*)recoilFunc, 5);
@@ -86,14 +85,14 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 				WriteToMemory(ammoFunc, ammoOpCode, 2);
 				WriteToMemory(nadeFunc, nadeOpCode, 2);
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 			}
 			else
 			{
 				WriteToMemory(ammoFunc, ammoOriginalBytes, 2);
 				WriteToMemory(nadeFunc, nadeOriginalBytes, 2);
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 			}
 		}
 		// noclip
@@ -112,7 +111,7 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 				{
 					player->noClip = 4;
 					system("cls");
-					showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+					showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 				}
 				__except (EXCEPTION_EXECUTE_HANDLER)
 				{
@@ -123,7 +122,7 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 			{
 				player->noClip = 0;
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 			}
 		}
 		// no recoil
@@ -135,13 +134,13 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 			{
 				WriteToMemory(recoilFunc, recoilOpCode, 5);
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 			}
 			else
 			{
 				WriteToMemory(recoilFunc, recoilOriginalBytes, 5);
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 			}
 		}
 		// yoru ult
@@ -158,9 +157,9 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 			{
 				__try
 				{
-					player->noClip = 11;
+					player->noClip = 7;
 					system("cls");
-					showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+					showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 				}
 				__except (EXCEPTION_EXECUTE_HANDLER)
 				{
@@ -171,7 +170,7 @@ void OverwriteOpcodes(HMODULE instance) noexcept
 			{
 				player->noClip = 0;
 				system("cls");
-				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+				showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 			}
 		}
 	}

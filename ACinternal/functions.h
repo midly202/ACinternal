@@ -17,7 +17,6 @@ extern bool invisEnabled;
 extern bool rapidFireEnabled;
 extern bool noRecoilEnabled;
 extern bool noKickbackEnabled;
-extern bool noKickbackLocked;
 extern bool noSpreadEnabled;
 extern bool aimbotEnabled;
 extern uintptr_t baseAddress;
@@ -114,14 +113,14 @@ bool CanUninject(bool thread1Running, bool thread2Running, bool thread3running, 
 		return true; // Returns true if all threads have exited
 }
 
-void showMenu(bool infiniteAmmo, bool noClip, bool Godmode, bool rapidFireEnabled, bool noRecoilEnabled, bool noKickbackEnabled, bool noKickbackLocked, bool invisEnabled, bool aimbotEnabled)
+void showMenu(bool infiniteAmmo, bool noClip, bool Godmode, bool rapidFireEnabled, bool noRecoilEnabled, bool noKickbackEnabled, bool invisEnabled, bool aimbotEnabled)
 {
 	std::cout << "[1] Infinite Ammo [" << (infiniteAmmo ? "ON" : "OFF") << "]\n";
 	std::cout << "[2] NoClip [" << (noClip ? "ON" : "OFF") << "]\n";
 	std::cout << "[3] Godmode [" << (Godmode ? "ON" : "OFF") << "]\n";
 	std::cout << "[4] Rapid Fire [" << (rapidFireEnabled ? "ON" : "OFF") << "]\n";
 	std::cout << "[5] No Recoil [" << (noRecoilEnabled ? "ON" : "OFF") << "]\n";
-	std::cout << "[6] No Kickback [" << (noKickbackEnabled ? "ON" : "OFF") << (noKickbackLocked ? "] [LOCKED]" : "]") << "\n";
+	std::cout << "[6] No Kickback [" << (noKickbackEnabled ? "ON" : "OFF") << "]\n";
 	std::cout << "[7] Invisible [" << (invisEnabled ? "ON" : "OFF") << "]\n";
 	std::cout << "[8] Aimbot [" << (aimbotEnabled ? "ON" : "OFF") << "]\n";
 }
@@ -202,11 +201,10 @@ bool WorldToScreen(Vec3 pos, Vec2& screen, float matrix[16], int windowWidth, in
 
 void ToggleNoKickback()
 {
-	noKickbackEnabled = true;
-	noKickbackLocked = true;
+	noKickbackEnabled = !noKickbackEnabled;
 	WaitForKeyRelease(VK_NUMPAD6);
 	system("cls");
-	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 }
 
 void MaintainNoKickback()
@@ -232,6 +230,16 @@ void MaintainNoKickback()
 		currentWeaponStatsStatic->weaponKickback = 0;
 
 		Sleep(5);
+
+		if (GetAsyncKeyState(VK_NUMPAD6) & 1)
+		{
+			noKickbackEnabled = false;
+			currentWeaponStatsStatic->weaponKickback = 10;
+			WaitForKeyRelease(VK_NUMPAD6);
+			system("cls");
+			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
+			break;
+		}
 	}
 }
 
@@ -240,7 +248,7 @@ void ToggleGodmode()
 	godmodeEnabled = !godmodeEnabled;
 	WaitForKeyRelease(VK_NUMPAD3);
 	system("cls");
-	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 }
 
 void MaintainGodmode()
@@ -263,7 +271,7 @@ void MaintainGodmode()
 			player->armor = 100;
 			WaitForKeyRelease(VK_NUMPAD3);
 			system("cls");
-			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 			break;
 		}
 	}
@@ -274,7 +282,7 @@ void ToggleRapidFire()
 	rapidFireEnabled = !rapidFireEnabled;
 	WaitForKeyRelease(VK_NUMPAD4);
 	system("cls");
-	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 }
 
 void MaintainRapidFire()
@@ -341,8 +349,7 @@ void MaintainRapidFire()
 			rapidFireEnabled = false;
 			WaitForKeyRelease(VK_NUMPAD4);
 			system("cls");
-			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled,
-				noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 			break;
 		}
 	}
@@ -353,7 +360,7 @@ void ToggleAimbot()
 	aimbotEnabled = !aimbotEnabled;
 	WaitForKeyRelease(VK_NUMPAD8);
 	system("cls");
-	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 }
 
 void MaintainAimbot()
@@ -366,7 +373,7 @@ void MaintainAimbot()
 			aimbotEnabled = false;
 			WaitForKeyRelease(VK_NUMPAD8);
 			system("cls");
-			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, noKickbackLocked, invisEnabled, aimbotEnabled);
+			showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 			break;
 		}
 
@@ -406,14 +413,8 @@ void MaintainAimbot()
 				float yaw = atan2f(abspos_y, abspos_x) * (180.0f / M_PI);
 				closest_yaw = yaw + 90.0f;
 
-				// Fixing low angle jitter
-				if (abspos_y < 0) abspos_y *= -1;
-				if (abspos_y < 5) 
-				{
-					if (abspos_x < 0) abspos_x *= -1;
-					abspos_y = abspos_x;
-				}
 				float horizontalDistance = sqrtf(abspos_x * abspos_x + abspos_y * abspos_y);
+				if (horizontalDistance < 0.0001f) horizontalDistance = 0.01f; // avoid division by zero
 				float pitch = atan2f(abspos_z, horizontalDistance) * (180.0f / M_PI);
 				closest_pitch = pitch;
 			}

@@ -122,7 +122,8 @@ public:
 	char pad_0064[1]; //0x0064
 	bool isStandingStill; //0x0065
 	bool isAiming; //0x0066
-	char pad_0067[15]; //0x0067
+	char pad_0067[13]; //0x0067
+	int16_t forceMove; //0x0074
 	int16_t noClip; //0x0076
 	char pad_0078[8]; //0x0078
 	int8_t moveLeft; //0x0080
