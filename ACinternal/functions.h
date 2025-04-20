@@ -26,6 +26,7 @@ extern uintptr_t entityList;
 extern uintptr_t ammoFunc;
 extern ent* player;
 extern gameInfo* game;
+extern CGameMode* gameMode;
 extern currWeapon* currentWeapon;
 extern weaponStatsDynamic* currentWeaponStatsDynamic;
 extern weaponStatsStatic* currentWeaponStatsStatic;
@@ -178,9 +179,9 @@ void PlaceJMP(BYTE* address, uintptr_t jumpTo, uintptr_t length)
 bool CanUninject(bool thread1Running, bool thread2Running, bool thread3running, bool thread4Running, bool thread5Running)
 {
 	if (thread1Running || thread2Running || thread3running || thread4Running || thread5Running)
-		return false; // Returns false if a thread is still running
+		return false;
 	else
-		return true; // Returns true if all threads have exited
+		return true;
 }
 
 void showMenu(bool infiniteAmmo, bool noClip, bool godmode, bool rapidFire, bool noRecoil, bool noKickback, bool invis, bool aimbot)
@@ -473,6 +474,10 @@ void MaintainAimbot()
 		int* current_players = (int*)(0x58AC0C);
 		if (!current_players || *current_players <= 0 || *current_players > 32) continue;
 
+		// Get current gamemode
+		CGameMode* gameMode = reinterpret_cast<CGameMode*>(baseAddress + offset::CGameModeBase);
+		if (!gameMode) return; // Optional: can be removed if the address is always valid
+
 		float closest_player = -1.0f;
 		float closest_yaw = 0.0f;
 		float closest_pitch = 0.0f;
@@ -480,10 +485,9 @@ void MaintainAimbot()
 		for (int i = 0; i < *current_players; i++) 
 		{
 			ent* enemy = entityList[i];
-			if (!enemy || enemy == player || enemy->health <= 0 || enemy->team == player->team) continue;
-
-			//IMPORTANT! NEED TO CHANGE!
-			// check gamemode if its team game; if so, enemy->team == player->team, compare this flag.
+			if (!enemy || enemy == player || enemy->health <= 0 ||
+				((gameMode->gameMode == 7 || gameMode->gameMode == 20 || gameMode->gameMode == 21) && enemy->team == player->team))
+				continue;
 
 			// Calculate positional difference
 			float abspos_x = enemy->posHead.x - player->posHead.x;

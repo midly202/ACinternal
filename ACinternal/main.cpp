@@ -9,6 +9,7 @@
 uintptr_t baseAddress = (uintptr_t)GetModuleHandleA("ac_client.exe");
 ent* player = NULL;
 gameInfo* game = NULL;
+CGameMode* gameMode = NULL;
 currWeapon* currentWeapon = NULL;
 weaponStatsDynamic* currentWeaponStatsDynamic = NULL;
 weaponStatsStatic* currentWeaponStatsStatic = NULL;

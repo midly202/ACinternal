@@ -6,6 +6,7 @@ namespace offset
 	constexpr uintptr_t playerBase = 0x17E0A8;
 	constexpr uintptr_t gameInfo = 0x18AC04;
 	constexpr uintptr_t entityList = 0x18AC04; // dereference gameInfo + 0 offset to get to entitylist
+	constexpr uintptr_t CGameModeBase = 0x18ABF4;
 
 	// ent
 	constexpr uintptr_t posHead = 0x4;
@@ -263,3 +264,11 @@ class entityList
 public:
 	char pad_0000[1048]; //0x0000
 }; //Size: 0x0418
+
+class CGameMode
+{
+public:
+	char pad_0000[4]; //0x0000
+	int8_t gameMode; //0x0004
+	char pad_0005[1086]; //0x0005
+}; //Size: 0x0443
