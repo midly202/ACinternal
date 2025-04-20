@@ -42,10 +42,10 @@ bool thread5Running = true;
 
 void Initialization(HMODULE instance) noexcept
 {
-	// Allocates console for debugging
 	AllocConsole();
 	FILE* f = nullptr;
 	freopen_s(&f, "CONOUT$", "w", stdout);
+	system("cls");
 	showMenu(infiniteAmmoEnabled, noclipEnabled, godmodeEnabled, rapidFireEnabled, noRecoilEnabled, noKickbackEnabled, invisEnabled, aimbotEnabled);
 	memcpy(ammoOriginalBytes, (void*)ammoFunc, 2);
 	memcpy(nadeOriginalBytes, (void*)nadeFunc, 2);
